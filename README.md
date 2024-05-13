@@ -1,6 +1,6 @@
 # Knowledge-Assisted Multi-Graph Structure Learning for Multivariate Time Series Anomaly Detection in Multi-Stage Processes
 
-Code implementation for : [Knowledge-Assisted Multi-Graph Structure Learning for Multivariate Time Series Anomaly Detection in Multi-Stage Processes]
+Code implementation for : [Knowledge-Assisted Multi-Graph Structure Learning for Multivariate Time Series Anomaly Detection in Multi-Stage Processes].
 
 The code is partly based on the implementation of ["Graph Neural Network-Based Anomaly Detection in Multivariate Time Series" (AAAI '21)](https://ojs.aaai.org/index.php/AAAI/article/view/16523).
 
