@@ -1,62 +1,30 @@
 gpu_n=$1
-DATASET=$2
-
-seed=5
-BATCH_SIZE=32
-SLIDE_WIN=15
-dim=64
-out_layer_num=1
-SLIDE_STRIDE=1
-topk=15
-out_layer_inter_dim=128
-val_ratio=0.2
-alpha=0.6
-decay=0
-
-
-path_pattern="${DATASET}"
-COMMENT="${DATASET}"
-
-EPOCH=30
-report='best'
-
+dim=128
+alp=0.3
+topk=10
+out_mode=1
+out_num=2
 if [[ "$gpu_n" == "cpu" ]]; then
-    python main.py \
-        -dataset $DATASET \
-        -save_path_pattern $path_pattern \
-        -slide_stride $SLIDE_STRIDE \
-        -slide_win $SLIDE_WIN \
-        -batch $BATCH_SIZE \
-        -epoch $EPOCH \
-        -comment $COMMENT \
-        -random_seed $seed \
-        -decay $decay \
-        -dim $dim \
-        -out_layer_num $out_layer_num \
-        -out_layer_inter_dim $out_layer_inter_dim \
-        -decay $decay \
-        -val_ratio $val_ratio \
-        -report $report \
-        -topk $topk \
-        -alpha $alpha \
-        -device 'cpu'
+    python main.py\
+        -batch 64\
+        -emb_dim $dim\
+        -feature_dim $dim\
+        -alpha $alp\
+        -topk $topk\
+        -dataset 'wadi'\
+        -early_stop_win 5\
+        -out_mode $out_mode\
+        -out_layer_num $out_num\
+        -scale_bool
 else
-    CUDA_VISIBLE_DEVICES=$gpu_n  python main.py \
-        -dataset $DATASET \
-        -save_path_pattern $path_pattern \
-        -slide_stride $SLIDE_STRIDE \
-        -slide_win $SLIDE_WIN \
-        -batch $BATCH_SIZE \
-        -epoch $EPOCH \
-        -comment $COMMENT \
-        -random_seed $seed \
-        -decay $decay \
-        -dim $dim \
-        -out_layer_num $out_layer_num \
-        -out_layer_inter_dim $out_layer_inter_dim \
-        -decay $decay \
-        -val_ratio $val_ratio \
-        -report $report \
-        -topk $topk \
-        -alpha $alpha 
-fi
+    CUDA_VISIBLE_DEVICES=$gpu_n python main.py\
+        -batch 64\
+        -emb_dim $dim\
+        -feature_dim $dim\
+        -alpha $alp\
+        -topk $topk\
+        -dataset 'wadi'\
+        -early_stop_win 5\
+        -out_mode $out_mode\
+        -out_layer_num $out_num\
+        -scale_bool
