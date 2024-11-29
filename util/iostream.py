@@ -1,20 +1,21 @@
+"""
 from util.data import get_attack_interval
 import time
 from datetime import datetime
 from pytz import utc, timezone
 from util.time import timestamp2str
 import json
-import argparse
 import numpy as np
+
 
 def printsep():
     print('='*40+'\n')
+
 
 def save_attack_infos(f1_scores, total_err_scores, labels, names, save_path, dataset, config):
     slide_win=config['slide_win']
     down_len=config['down_len']
 
-    
     if dataset == 'wadi' or dataset == 'wadi2':
         s = '09/10/2017 18:00:00'
     elif dataset == 'swat':
@@ -54,15 +55,13 @@ def save_attack_infos(f1_scores, total_err_scores, labels, names, save_path, dat
 
         topk_err_score_map.append(item)
 
-        
     for head, end in attack_inters:
         attack_infos = {}
         topk_attack_infos = {}
 
         head_t = timestamp2str(start_s+(head+slide_win)*down_len, fmt, cst8)
         end_t = timestamp2str(start_s+(end+slide_win)*down_len, fmt, cst8)
-    
-        
+
         for i in range(head, end):
             t = timestamp2str(start_s+(i+slide_win)*down_len, fmt, cst8)
             max_sensor = anomaly_sensors[i]
@@ -72,15 +71,14 @@ def save_attack_infos(f1_scores, total_err_scores, labels, names, save_path, dat
                 attack_infos[max_sensor] = 0
             attack_infos[max_sensor] += 1
 
-            
             for anomaly_sensor in topk_sensors:
                 if anomaly_sensor not in topk_attack_infos:
                     topk_attack_infos[anomaly_sensor] = 0
                 topk_attack_infos[anomaly_sensor] += topk_err_score_map[i][anomaly_sensor]
-            
 
         sorted_attack_infos = {k: v for k, v in sorted(attack_infos.items(), reverse=True, key=lambda item: item[1])}
-        sorted_topk_attack_infos = {k: v for k, v in sorted(topk_attack_infos.items(), reverse=True, key=lambda item: item[1])}
+        sorted_topk_attack_infos = {k: v for k, v in sorted(topk_attack_infos.items(),
+                                                            reverse=True, key=lambda item: item[1])}
 
         save_infos['attacks'].append({
             'start': head_t,
@@ -92,3 +90,4 @@ def save_attack_infos(f1_scores, total_err_scores, labels, names, save_path, dat
 
     with open(save_path, 'w+') as outfile:
         json.dump(save_infos, outfile, indent=4)  
+"""

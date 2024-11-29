@@ -160,7 +160,7 @@ class TCN(nn.Module):
         return z3
 
 
-class Proposed(nn.Module):
+class SG(nn.Module):
     def __init__(self,
                  edge_index,
                  node_num,
@@ -179,7 +179,7 @@ class Proposed(nn.Module):
                  kernel_size=3,
                  out_mode=1,
                  ):
-        super(Proposed, self).__init__()
+        super(SG, self).__init__()
 
         self.device = get_device()
 
@@ -203,7 +203,7 @@ class Proposed(nn.Module):
 
         self.gnn_layer1 = GNNLayer(slide_win, feature_dim, emb_dim, dropout)
         self.gnn_layer2 = GNNLayer(slide_win, feature_dim, emb_dim, dropout)
-        self.gnn_layer3 = GNNLayer(slide_win, feature_dim, emb_dim, dropout)
+        #self.gnn_layer3 = GNNLayer(slide_win, feature_dim, emb_dim, dropout)
 
         self.relu = nn.ReLU()
         self.adj_ui = None
@@ -214,7 +214,7 @@ class Proposed(nn.Module):
         print(f'out_mode: {out_mode}')
 
         if out_mode == 1:
-            out_in_dim = 3*feature_dim+2*emb_dim
+            out_in_dim = 2*feature_dim+2*emb_dim
         elif out_mode == 2:
             out_in_dim = feature_dim+2*emb_dim
         elif out_mode == 3:
@@ -289,11 +289,11 @@ class Proposed(nn.Module):
             gated_sg_i.extend([i] * len(topk_indices_sg_i))
             gated_sg_j.extend(topk_indices_sg_i)
 
-            topk_indices_pf_i = torch.topk(c_ji_pf[:, i], self.topk_list2[i])[1].tolist()
-            topk_indices_pf.append(topk_indices_pf_i)
+            #topk_indices_pf_i = torch.topk(c_ji_pf[:, i], self.topk_list2[i])[1].tolist()
+            #topk_indices_pf.append(topk_indices_pf_i)
 
-            gated_pf_i.extend([i] * len(topk_indices_pf_i))
-            gated_pf_j.extend(topk_indices_pf_i)
+            #gated_pf_i.extend([i] * len(topk_indices_pf_i))
+            #gated_pf_j.extend(topk_indices_pf_i)
 
         # sensor group
         self.adj_sg = topk_indices_sg
@@ -306,30 +306,30 @@ class Proposed(nn.Module):
         gnn_out2 = self.gnn_layer2(z, batch_gated_edge_index_sg, embedding=[batch_s_emb, batch_t_emb])
 
         # process flow
-        self.adj_pf = topk_indices_pf
+        '''self.adj_pf = topk_indices_pf
 
         gated_pf_i = torch.tensor(gated_pf_i).unsqueeze(0).to(self.device)
         gated_pf_j = torch.tensor(gated_pf_j).unsqueeze(0).to(self.device)
         gated_edge_index_pf = torch.cat((gated_pf_j, gated_pf_i), dim=0)
 
         batch_gated_edge_index_pf = get_batch_edge_index2(gated_edge_index_pf, batch_num, node_num)
-        gnn_out3 = self.gnn_layer3(z, batch_gated_edge_index_pf, embedding=[batch_s_emb, batch_t_emb])
+        gnn_out3 = self.gnn_layer3(z, batch_gated_edge_index_pf, embedding=[batch_s_emb, batch_t_emb])'''
 
         # output
         if self.out_mode == 1:
-            h_f = torch.cat((gnn_out1, gnn_out2, gnn_out3,
+            h_f = torch.cat((gnn_out1, gnn_out2,
                              batch_s_emb, batch_t_emb), dim=-1).view(batch_num, node_num, -1)
         elif self.out_mode == 2:
-            h_f = torch.cat((gnn_out1 + gnn_out2 + gnn_out3,
+            h_f = torch.cat((gnn_out1 + gnn_out2,
                              batch_s_emb, batch_t_emb), dim=-1).view(batch_num, node_num, -1)
         elif self.out_mode == 3:
-            h_f = torch.cat((gnn_out1 + gnn_out2 + gnn_out3,
+            h_f = torch.cat((gnn_out1 + gnn_out2,
                              batch_s_emb + batch_t_emb), dim=-1).view(batch_num, node_num, -1)
         elif self.out_mode == 4:
-            h_f = torch.mul(gnn_out1 + gnn_out2 + gnn_out3,
+            h_f = torch.mul(gnn_out1 + gnn_out2,
                             batch_s_emb + batch_t_emb).view(batch_num, node_num, -1)
         else:
-            gnn_out_sum = gnn_out1 + gnn_out2 + gnn_out3
+            gnn_out_sum = gnn_out1 + gnn_out2
             h_f = torch.cat((torch.mul(gnn_out_sum, batch_s_emb),
                              torch.mul(gnn_out_sum, batch_t_emb)), dim=-1).view(batch_num, node_num, -1)
 
