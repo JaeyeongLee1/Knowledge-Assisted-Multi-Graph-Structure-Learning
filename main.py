@@ -41,7 +41,6 @@ class Main:
             test_orig = pd.read_csv(f'./data/{dataset}/test.csv', sep=',', index_col=0)
         else:
             assert dataset == 'swat'
-            # small swat -> swat으로 변경 하시오
             train_orig = pd.read_csv(f'./data/{dataset}/train.csv', sep=',', index_col=0)
             test_orig = pd.read_csv(f'./data/{dataset}/test.csv', sep=',', index_col=0)
 
@@ -98,14 +97,10 @@ class Main:
         self.val_dataloader = val_dataloader
         self.test_dataloader = DataLoader(test_dataset, batch_size=train_config_['batch'], shuffle=False, num_workers=0)
 
-        # 확인 후 불필요한것 제거해주기 바람
         process_dict = {
             'swat': [list(range(0, 5)), list(range(5, 16)), list(range(16, 25)), list(range(25, 34)),
                      list(range(34, 47)), list(range(47, 51))],
             'wadi': [list(range(0, 19)), list(range(19, 94)), list(range(94, 109)), list(range(109, 112))],
-            'wadi_zscore': [list(range(0, 19)), list(range(19, 94)), list(range(94, 109)), list(range(109, 112))],
-            'small_swat': [list(range(0, 5)), list(range(5, 16)), list(range(16, 25)),
-                           list(range(25, 34)), list(range(34, 47)), list(range(47, 51))],
             'msl': [[0, 1, 2, 8, 9, 10, 25], [3], [4, 11, 20, 22], [5, 6, 14, 15, 19, 21],
                     [7, 16, 17, 26], [12, 13], [18, 23, 24]]
         }
@@ -130,7 +125,7 @@ class Main:
         process_mat = process_mat_dict[dataset]
         mask1 = torch.zeros(len(feature_map), len(feature_map)).to(self.device)
 
-        if dataset == 'wadi':  # wadi ignore last process info
+        if dataset == 'wadi':  
             num_process = len(process_info) - 1
         else:
             assert dataset == 'swat'
@@ -204,7 +199,6 @@ class Main:
         self.get_score(test_result, val_result, result_path)
 
     def get_loaders(self, train_dataset, seed, batch, val_ratio=0.1, slide_win=15):
-        # slide_stride가 1이 아닌경우 path에 {slide_stride} 추가해야함
         path_train_sub_indices = f'./data/{self.env_config["dataset"]}/' \
                                  f'train_sub_indices_{slide_win}_{val_ratio}_{seed}.pt'
         path_valid_sub_indices = f'./data/{self.env_config["dataset"]}/' \
@@ -247,8 +241,7 @@ class Main:
             rs.write(head)
             rs.close()
 
-        # 성능 나오는것 보고 9에서 최대라면 9이상도 해볼것
-        # 평균 성능 낼 때는 동일한 b_num, epsilon 적용
+        
         b_num_list = [0, 1, 3, 5, 7, 9, 11, 13]
         epsilon_list = [1e-1, 1e-2, 1e-3, 1e-4]
 
@@ -344,13 +337,13 @@ if __name__ == "__main__":
     parser.add_argument('-report', help='best / val', type=str, default='best')
     parser.add_argument('-device', help='cuda / cpu', type=str, default='cuda')
 
-    # True 확인
+    
     parser.add_argument('-scale_bool', action='store_true')
     parser.add_argument('-out_mode', type=int, default=4)
 
-    # 서버 이용시 주석처리
+    
     '''sys.argv = [
-        'main3.py',
+        'main.py',
         '-random_seed', '0',
 
         '-batch', '64',
