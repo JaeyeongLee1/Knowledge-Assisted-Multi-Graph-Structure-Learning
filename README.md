@@ -55,7 +55,7 @@ data
 You can change running parameters in the run.sh.
 
 # Others
-SWaT and WADI datasets can be requested from [iTrust](https://itrust.sutd.edu.sg/itrust-labs_datasets/)
+SWaT and WADI datasets can be requested from [iTrust](https://itrust.sutd.edu.sg/itrust-labs_datasets/) 
 
 
 ```
